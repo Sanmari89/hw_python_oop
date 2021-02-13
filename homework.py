@@ -30,7 +30,18 @@ class Calculator:
                 result += record.amount
         return result
 
+    def get_week_stats(self):
+        today = dt.now().date()
+        date_list = [today - td(days=x) for x in range(7)]
+        return self.dates_records(date_list)
 
+    def get_today_stats(self):
+        count = 0
+        today = dt.now().date()
+        for record in self.records:
+            if record.date == today:
+                count += record.amount
+        return count
 
 
 class Record:
@@ -57,22 +68,10 @@ class CaloriesCalculator(Calculator):
                     result = 'Хватит есть!'
         return result
 
-    def get_week_stats(self):
-        today = dt.now().date()
-        date_list = [today - td(days=x) for x in range(7)]
-        return f'За последние 7 дней получено {self.dates_records(date_list)} калорий'
-
 
 class CashCalculator(Calculator):
     USD_RATE = 76.0
     EURO_RATE = 91.0
-    def get_today_stats(self):
-        count_money = 0
-        today = dt.now().date()
-        for record in self.records:
-            if record.date == today:
-                count_money += record.amount
-        return count_money
 
     def get_today_cash_remained(self, currency):
         dif = self.limit - self.get_today_stats()
@@ -97,8 +96,3 @@ class CashCalculator(Calculator):
                 return f'На сегодня осталось {round(dif / CashCalculator.EURO_RATE, 2)} Euro'
             else:
                 return f'Денег нет, держись: твой долг - {abs(round(dif / CashCalculator.EURO_RATE, 2))} Euro'
-
-    def get_week_stats(self):
-        today = dt.now().date()
-        date_list = [today - td(days=x) for x in range(7)]
-        return f'За последние 7 дней потрачено {self.dates_records(date_list)} рублей'
