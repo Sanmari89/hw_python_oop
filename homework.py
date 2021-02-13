@@ -41,7 +41,7 @@ class Record:
     def __init__(self, amount, comment, date=dt.now().date()):
         date_format = '%d.%m.%Y'
         if type(date) == str:
-            date = dt.strptime(date,date_format).date()
+            date = dt.strptime(date, date_format).date()
         self.amount = amount
         self.comment = comment
         self.date = date
@@ -50,14 +50,16 @@ class Record:
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         count_calories = 0
-        result = f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {self.limit} кКал'
+        result = (f'Сегодня можно съесть что-нибудь ещё, '
+                  f'но с общей калорийностью не более {self.limit} кКал')
         for record in self.records:
             today = dt.now().date()
             if record.date == today:
                 count_calories += record.amount
                 if count_calories < self.limit:
                     N = self.limit - count_calories
-                    result = f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {N} кКал'
+                    result = (f'Сегодня можно съесть что-нибудь ещё, '
+                              f'но с общей калорийностью не более {N} кКал')
                 else:
                     result = 'Хватит есть!'
         return result
@@ -76,9 +78,10 @@ class CashCalculator(Calculator):
         value = round(dif / currency_dict[currency][0], 2)
 
         if dif == 0:
-                return 'Денег нет, держись'
+            return 'Денег нет, держись'
 
         if self.limit > self.get_today_stats():
             return f'На сегодня осталось {value} {currency_dict[currency][1]}'
         else:
-            return f'Денег нет, держись: твой долг - {abs(value)} {currency_dict[currency][1]}'
+            return (f'Денег нет, держись: твой долг - {abs(value)} '
+                    f'{currency_dict[currency][1]}')
