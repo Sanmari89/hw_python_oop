@@ -16,13 +16,6 @@ class Calculator:
             result += record.amount
         return result
 
-    def date_records(self, date):
-        result = 0
-        for record in self.records:
-            if record.date == date:
-                result += record.amount
-        return result
-
     def dates_records(self, date_list):
         result = 0
         for record in self.records:
@@ -57,6 +50,7 @@ class Record:
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         count_calories = 0
+        result = f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {self.limit} кКал'
         for record in self.records:
             today = dt.now().date()
             if record.date == today:
@@ -74,25 +68,17 @@ class CashCalculator(Calculator):
     EURO_RATE = 91.0
 
     def get_today_cash_remained(self, currency):
-        dif = self.limit - self.get_today_stats()
+        currency_dict = {'usd': (CashCalculator.USD_RATE, 'USD'),
+                         'eur': (CashCalculator.EURO_RATE, 'Euro'),
+                         'rub': (1, 'руб')}
 
-        if self.limit == self.get_today_stats():
+        dif = self.limit - self.get_today_stats()
+        value = round(dif / currency_dict[currency][0], 2)
+
+        if dif == 0:
                 return 'Денег нет, держись'
 
-        if currency == 'rub':
-            if self.limit > self.get_today_stats():
-                return f'На сегодня осталось {dif} руб'
-            else:
-                return f'Денег нет, держись: твой долг - {abs(dif)} руб'
-
-        elif currency == 'usd':
-            if self.limit > self.get_today_stats():
-                return f'На сегодня осталось {round(dif / CashCalculator.USD_RATE, 2)} USD'
-            else:
-                return f'Денег нет, держись: твой долг - {abs(round(dif / CashCalculator.USD_RATE, 2))} USD'
-
-        elif currency == 'eur':
-            if self.limit > self.get_today_stats():
-                return f'На сегодня осталось {round(dif / CashCalculator.EURO_RATE, 2)} Euro'
-            else:
-                return f'Денег нет, держись: твой долг - {abs(round(dif / CashCalculator.EURO_RATE, 2))} Euro'
+        if self.limit > self.get_today_stats():
+            return f'На сегодня осталось {value} {currency_dict[currency][1]}'
+        else:
+            return f'Денег нет, держись: твой долг - {abs(value)} {currency_dict[currency][1]}'
