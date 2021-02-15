@@ -77,4 +77,4 @@ class CashCalculator(Calculator):
             return f'На сегодня осталось {value} {currency}'
 
         return (f'Денег нет, держись: твой долг - {value} '
-                    f'{currency}')
+                f'{currency}')
