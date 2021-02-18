@@ -1,4 +1,5 @@
 import datetime as dt
+DATE_FORMAT = '%d.%m.%Y'
 
 
 class Calculator:
@@ -11,9 +12,10 @@ class Calculator:
 
     def get_week_stats(self):
         today = dt.datetime.now().date()
+        that_week = today - dt.timedelta(weeks=1)
         result = 0
         for record in self.records:
-            if today - dt.timedelta(weeks=1) <= record.date <= today:
+            if that_week <= record.date <= today:
                 result += record.amount
         return result
 
@@ -30,13 +32,11 @@ class Calculator:
 
 
 class Record:
-    date_format = '%d.%m.%Y'
-
     def __init__(self, amount, comment, date=None):
         if date is None:
             date = dt.datetime.now().date()
         else:
-            date = dt.datetime.strptime(date, Record.date_format).date()
+            date = dt.datetime.strptime(date, DATE_FORMAT).date()
         self.amount = amount
         self.comment = comment
         self.date = date
@@ -44,15 +44,12 @@ class Record:
 
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
-        today_stats = self.get_today_stats()
-        if self.limit <= today_stats:
+        today_diff = self.diff(self.get_today_stats())
+        if today_diff <= 0:
             return 'Хватит есть!'
-
-        diff = self.diff(today_stats)
-
-        if diff > 0:
+        else:
             return ('Сегодня можно съесть что-нибудь ещё, '
-                    f'но с общей калорийностью не более {diff} кКал')
+                    f'но с общей калорийностью не более {today_diff} кКал')
 
 
 class CashCalculator(Calculator):
@@ -70,11 +67,11 @@ class CashCalculator(Calculator):
                          'rub': (1, 'руб')}
 
         diff = self.diff(today_stats)
-        value = abs(round(diff / currency_dict[currency][0], 2))
+        value = round(diff / currency_dict[currency][0], 2)
         currency = currency_dict[currency][1]
 
         if diff > 0:
             return f'На сегодня осталось {value} {currency}'
 
-        return (f'Денег нет, держись: твой долг - {value} '
+        return (f'Денег нет, держись: твой долг - {abs(value)} '
                 f'{currency}')
