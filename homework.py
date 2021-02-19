@@ -27,24 +27,23 @@ class Calculator:
                 count += record.amount
         return count
 
-    def diff(self, today_stats):
-        return self.limit - today_stats
+    def get_diff(self):
+        return self.limit - self.get_today_stats()
 
 
 class Record:
     def __init__(self, amount, comment, date=None):
-        if date is None:
-            date = dt.datetime.now().date()
-        else:
-            date = dt.datetime.strptime(date, DATE_FORMAT).date()
         self.amount = amount
         self.comment = comment
-        self.date = date
+        if date is None:
+            self.date = dt.datetime.now().date()
+        else:
+            self.date = dt.datetime.strptime(date, DATE_FORMAT).date()
 
 
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
-        today_diff = self.diff(self.get_today_stats())
+        today_diff = self.get_diff()
         if today_diff <= 0:
             return 'Хватит есть!'
         else:
@@ -62,16 +61,16 @@ class CashCalculator(Calculator):
         if self.limit == today_stats:
             return 'Денег нет, держись'
 
-        currency_dict = {'usd': (CashCalculator.USD_RATE, 'USD'),
-                         'eur': (CashCalculator.EURO_RATE, 'Euro'),
+        currency_dict = {'usd': (self.USD_RATE, 'USD'),
+                         'eur': (self.EURO_RATE, 'Euro'),
                          'rub': (1, 'руб')}
 
-        diff = self.diff(today_stats)
-        value = round(diff / currency_dict[currency][0], 2)
+        diff = self.get_diff()
+        value = abs(round(diff / currency_dict[currency][0], 2))
         currency = currency_dict[currency][1]
 
         if diff > 0:
             return f'На сегодня осталось {value} {currency}'
 
-        return (f'Денег нет, держись: твой долг - {abs(value)} '
+        return (f'Денег нет, держись: твой долг - {value} '
                 f'{currency}')
