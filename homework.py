@@ -56,14 +56,15 @@ class CashCalculator(Calculator):
     EURO_RATE = 91.0
 
     def get_today_cash_remained(self, currency):
-        if self.limit == self.get_today_stats():
+        diff = self.get_diff()
+
+        if diff == 0:
             return 'Денег нет, держись'
 
         currency_dict = {'usd': (self.USD_RATE, 'USD'),
                          'eur': (self.EURO_RATE, 'Euro'),
                          'rub': (1, 'руб')}
 
-        diff = self.get_diff()
         value = abs(round(diff / currency_dict[currency][0], 2))
         currency = currency_dict[currency][1]
 
