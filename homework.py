@@ -44,11 +44,11 @@ class Record:
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         today_diff = self.get_diff()
-        if today_diff <= 0:
+        if self.get_diff() <= 0:
             return 'Хватит есть!'
-        else:
-            return ('Сегодня можно съесть что-нибудь ещё, '
-                    f'но с общей калорийностью не более {today_diff} кКал')
+
+        return ('Сегодня можно съесть что-нибудь ещё, '
+                f'но с общей калорийностью не более {today_diff} кКал')
 
 
 class CashCalculator(Calculator):
@@ -56,9 +56,7 @@ class CashCalculator(Calculator):
     EURO_RATE = 91.0
 
     def get_today_cash_remained(self, currency):
-        today_stats = self.get_today_stats()
-
-        if self.limit == today_stats:
+        if self.limit == self.get_today_stats():
             return 'Денег нет, держись'
 
         currency_dict = {'usd': (self.USD_RATE, 'USD'),
